@@ -65,11 +65,13 @@
       <el-col
         v-if="allDone===true"
         :span="this.$device.isDesktop ? 12 : 22"
-        style="text-align: center;"
+        style="text-align: center; margin-top: 30px;"
       >
-        <img :src="adUrl" id="ad" hidden/>
-        <img id="bg" :src="backgroundUrl" width="100%" hidden/>
-        <img id="res" :src="finalResultUrl" />
+        <img :src="adUrl" id="ad" hidden />
+        <img src="../assets/百词斩.png" id="icon" width="20" hidden />
+        <img src="../assets/calendar.png" id="calendar" width="20" hidden />
+        <img id="bg" :src="backgroundUrl" width="450px" hidden />
+        <canvas id="res" :width="bgInfo.width" :height="bgInfo.height"></canvas>
       </el-col>
     </el-row>
   </div>
@@ -122,12 +124,16 @@ export default {
       cutFinished: false,
       allDone: false,
       backgroundUrl: "",
-      currentDateUrl: "",
-      randomWordUrl: "",
-      phoneticUrl: "",
+      currentDate: 1592839849000,
+      /*randomWordUrl: "",
+      phoneticUrl: "",*/
       QRCodeUrl: "",
       adUrl: "",
       finalResultUrl: "",
+      bgInfo: {
+        width: 0,
+        height: 0
+      },
       form: {
         daynum: 0,
         wordnum: 0
@@ -224,28 +230,115 @@ export default {
       return true;
     },
     finishCut() {
+      this.bgInfo.width = 450;
+      this.bgInfo.height = 600;
       this.$refs["cropper"].getCropBlob(async data => {
+        this.backgroundUrl = URL.createObjectURL(data);
         console.log(data);
         this.ensured = false;
         this.cutFinished = true;
         this.allDone = true;
-        this.backgroundUrl = URL.createObjectURL(data);
         console.log(this.backgroundUrl);
-        await setTimeout(()=>{}, 200);
+        await setTimeout(() => {}, 200);
         this.toDrawImage();
       });
     },
     toDrawImage() {
+      /**
+       * @author zhangxinxu(.com)
+       * @licence MIT
+       * @description http://www.zhangxinxu.com/wordpress/?p=7362
+       */
+
+      CanvasRenderingContext2D.prototype.letterSpacingText = function(
+        text,
+        x,
+        y,
+        letterSpacing
+      ) {
+        var context = this;
+        var canvas = context.canvas;
+        if (!letterSpacing && canvas) {
+          letterSpacing = parseFloat(
+            window.getComputedStyle(canvas).letterSpacing
+          );
+        }
+        if (!letterSpacing) {
+          return this.fillText(text, x, y);
+        }
+        var arrText = text.split("");
+        var align = context.textAlign || "left";
+        // 这里仅考虑水平排列
+        var originWidth = context.measureText(text).width;
+        // 应用letterSpacing占据宽度
+        var actualWidth = originWidth + letterSpacing * (arrText.length - 1);
+        // 根据水平对齐方式确定第一个字符的坐标
+        if (align == "center") {
+          x = x - actualWidth / 2;
+        } else if (align == "right") {
+          x = x - actualWidth;
+        }
+        // 临时修改为文本左对齐
+        context.textAlign = "left";
+        // 开始逐字绘制
+        arrText.forEach(function(letter) {
+          var letterWidth = context.measureText(letter).width;
+          context.fillText(letter, x, y);
+          // 确定下一个字符的横坐标
+          x = x + letterWidth + letterSpacing;
+        });
+        // 对齐方式还原
+        context.textAlign = align;
+      };
       let background = document.getElementById("bg");
       console.log(background);
-      let canvas = document.createElement("canvas");
-      canvas
-        .getContext("2d")
-        .drawImage(background, 0, 0, background.width, background.height);
-      let ctx = canvas.getContext("2d");
-      ctx.font = "14px Microsoft YaHei"; //canvas字体
-      ctx.fillStyle = "black";
-      ctx.fillText("我在百词斩背单词", 10, 50);
+      let canvas = document.getElementById("res");
+      background.width = this.bgInfo.width;
+      background.height = this.bgInfo.height;
+      console.log(background.width, background.height);
+      let bgImage = new Image();
+      console.log(document.getElementById("calendar"));
+      bgImage.onload = () => {
+        canvas
+          .getContext("2d")
+          .drawImage(bgImage, 0, 0, this.bgInfo.width, this.bgInfo.height);
+        canvas
+          .getContext("2d")
+          .drawImage(document.getElementById("calendar"), 24, 482, 18, 18);
+        canvas
+          .getContext("2d")
+          .drawImage(document.getElementById("icon"), 25, 25, 33, 33);
+        let ctx = canvas.getContext("2d");
+        ctx.font = "16px 微软雅黑"; //canvas字体
+        ctx.fillStyle = "#fef9f3";
+        ctx.letterSpacingText("我在百词斩背单词", 76, 48, 1);
+        ctx.font = "16px Arial";
+        let targetTime = new Date(this.currentDate);
+        console.log(targetTime.toDateString());
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const months = ["January", "February", "March", "April", "May", "June", 
+        "July", "August", "September", "October", "November", "December"];
+        let dateText = "";
+        const texts = targetTime.toDateString().split(" ");
+        texts.forEach((data) => {
+          days.forEach((day) => {
+            if (day.startsWith(data)) {
+              dateText = dateText + day + ", ";
+            }
+          })
+          months.forEach((month) => {
+            if (month.startsWith(data)) {
+              dateText = dateText + month + " ";
+            }
+          })
+        });
+        dateText = dateText + texts[2].toString();
+        console.log(dateText);
+        ctx.letterSpacingText(dateText, 50, 498, 0);
+      };
+      bgImage.src = this.backgroundUrl;
+
+      console.log(bgImage);
       this.adUrl = canvas.toDataURL("image/png");
       this.finalResultUrl = canvas.toDataURL("image/png");
       console.log(canvas);
