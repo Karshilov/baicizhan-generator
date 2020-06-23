@@ -397,9 +397,9 @@ export default {
         console.log(dateText);
         ctx.letterSpacingText(dateText, 50*2, 498*2, 0);
         ctx.font = "70px Bahnschrift";
-        ctx.fillText(this.form.wordnum.toString(), 24*2, 552*2, ctx.measureText(this.form.wordnum.toString()).width - 8);
-        ctx.fillText(this.form.daynum.toString(), 118*2, 552*2, ctx.measureText(this.form.daynum.toString()).width - 8);
-        ctx.font = " 100 26px 微软雅黑";
+        ctx.fillText(this.form.wordnum.toString(), 24*2, 544*2, ctx.measureText(this.form.wordnum.toString()).width - 8);
+        ctx.fillText(this.form.daynum.toString(), 118*2, 544*2, ctx.measureText(this.form.daynum.toString()).width - 8);
+        ctx.font = " 100 24px 微软雅黑";
         ctx.fillStyle = "#DCDCDC";
         ctx.letterSpacingText("今日单词", 24*2, 572*2, 1);
         ctx.letterSpacingText("坚持天数", 118*2, 572*2, 1);
