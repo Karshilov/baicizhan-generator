@@ -28,10 +28,40 @@
         style="margin: 20px;"
         @click="finishCut"
       >裁剪完成</el-button>
-      <el-form v-if="cutFinished===true">
-        <el-form-item>
-          <el-input></el-input>
+      <el-form v-if="cutFinished===true" ref="user" v-model="form" style="text-align: center;">
+        <el-form-item
+          label="已背总天数"
+          :rules="[
+            { required: true, message: '天数不能为空'},
+            { type: 'number', message: '天数必须为数字值'}
+          ]"
+        >
+          <el-input v-model.number="form.daynum"></el-input>
         </el-form-item>
+        <el-form-item 
+          label="今日单词数"
+          :rules="[
+            { required: true, message: '单词数不能为空'},
+            { type: 'number', message: '单词数必须为数字值'}
+          ]"
+        >
+          <el-input v-model.number="form.wordnum"></el-input>
+        </el-form-item>
+        <el-form-item
+          label="打卡日期"
+          :rules="[
+            { required: true, message: '日期不能为空'},
+          ]"
+        >
+          <el-date-picker
+            v-model="form.currentDate"
+            type="date"
+            placeholder="选择日期"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="timestamp">
+          ></el-date-picker>
+        </el-form-item>
+        <el-button type="primary" style="margin: 20px;" @click="finishChoose">确认提交</el-button>
       </el-form>
     </el-dialog>
     <el-row type="flex" justify="center" align="center">
@@ -66,7 +96,8 @@
         v-if="allDone===true"
         :span="this.$device.isDesktop ? 12 : 22"
         style="text-align: center; margin-top: 30px;"
-      >
+      > 
+        <img src="../assets/QRCode.png" id="QRCode" hidden>
         <img :src="adUrl" id="ad" hidden />
         <img src="../assets/百词斩.png" id="icon" width="20" hidden />
         <img src="../assets/calendar.png" id="calendar" width="20" hidden />
@@ -79,7 +110,7 @@
 
 <script>
 //https://android.myapp.com/myapp/detail.htm?apkName=com.jiongji.andriod.card&ADTAG=mobile
-//num: Brayden Sans
+//num: condensed
 //word: Jackey_HandWrite Regular
 import { VueCropper } from "vue-cropper";
 import {
@@ -90,7 +121,8 @@ import {
   Dialog,
   Form,
   FormItem,
-  Input
+  Input,
+  DatePicker
 } from "element-ui";
 export default {
   components: {
@@ -102,7 +134,8 @@ export default {
     "el-dialog": Dialog,
     "el-form": Form,
     "el-form-item": FormItem,
-    "el-input": Input
+    "el-input": Input,
+    "el-date-picker": DatePicker
   },
   data() {
     return {
@@ -124,7 +157,6 @@ export default {
       cutFinished: false,
       allDone: false,
       backgroundUrl: "",
-      currentDate: 1592839849000,
       /*randomWordUrl: "",
       phoneticUrl: "",*/
       QRCodeUrl: "",
@@ -136,7 +168,8 @@ export default {
       },
       form: {
         daynum: 0,
-        wordnum: 0
+        wordnum: 0,
+        currentDate: 1592839849000
       }
     };
   },
@@ -229,18 +262,21 @@ export default {
       console.log(this.imgUrl);
       return true;
     },
+    async finishChoose() {
+      this.allDone = true;
+      this.ensured = false;
+      await setTimeout(() => {}, 200);
+      this.toDrawImage();
+    },
     finishCut() {
+      this.cutFinished = false;
       this.bgInfo.width = 450;
       this.bgInfo.height = 600;
       this.$refs["cropper"].getCropBlob(async data => {
         this.backgroundUrl = URL.createObjectURL(data);
         console.log(data);
-        this.ensured = false;
         this.cutFinished = true;
-        this.allDone = true;
         console.log(this.backgroundUrl);
-        await setTimeout(() => {}, 200);
-        this.toDrawImage();
       });
     },
     toDrawImage() {
@@ -308,33 +344,68 @@ export default {
         canvas
           .getContext("2d")
           .drawImage(document.getElementById("icon"), 25, 25, 33, 33);
+        canvas
+          .getContext("2d")
+          .drawImage(document.getElementById("QRCode"), 365, 496, 63, 63);
         let ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = false;
         ctx.font = "16px 微软雅黑"; //canvas字体
         ctx.fillStyle = "#fef9f3";
         ctx.letterSpacingText("我在百词斩背单词", 76, 48, 1);
         ctx.font = "16px Arial";
-        let targetTime = new Date(this.currentDate);
+        let targetTime = new Date(this.form.currentDate);
         console.log(targetTime.toDateString());
-        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-        const months = ["January", "February", "March", "April", "May", "June", 
-        "July", "August", "September", "October", "November", "December"];
+        const days = [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ];
+        const months = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December"
+        ];
         let dateText = "";
         const texts = targetTime.toDateString().split(" ");
-        texts.forEach((data) => {
-          days.forEach((day) => {
+        texts.forEach(data => {
+          days.forEach(day => {
             if (day.startsWith(data)) {
               dateText = dateText + day + ", ";
             }
-          })
-          months.forEach((month) => {
+          });
+          months.forEach(month => {
             if (month.startsWith(data)) {
               dateText = dateText + month + " ";
             }
-          })
+          });
         });
         dateText = dateText + texts[2].toString();
         console.log(dateText);
         ctx.letterSpacingText(dateText, 50, 498, 0);
+        ctx.font = "35px Bahnschrift";
+        ctx.fillText(this.form.wordnum.toString(), 24, 552, ctx.measureText(this.form.wordnum.toString()).width - 8);
+        ctx.fillText(this.form.daynum.toString(), 118, 552, ctx.measureText(this.form.daynum.toString()).width - 8);
+        ctx.font = " 100 13px 微软雅黑";
+        ctx.fillStyle = "#DCDCDC";
+        ctx.letterSpacingText("今日单词", 24, 572, 1);
+        ctx.letterSpacingText("坚持天数", 118, 572, 1);
+        ctx.font = " 100 9px 微软雅黑";
+        ctx.letterSpacingText("扫码下载", 355, 572, 1);
+        ctx.font = " 500 9px 微软雅黑";
+        ctx.letterSpacingText("百词斩", 398, 572, 1);
       };
       bgImage.src = this.backgroundUrl;
 
@@ -342,7 +413,7 @@ export default {
       this.adUrl = canvas.toDataURL("image/png");
       this.finalResultUrl = canvas.toDataURL("image/png");
       console.log(canvas);
-    }
+    },
   }
 };
 </script>
