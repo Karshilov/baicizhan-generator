@@ -102,7 +102,8 @@
         <img src="../assets/百词斩.png" id="icon" width="20" hidden />
         <img src="../assets/calendar.png" id="calendar" width="20" hidden />
         <img id="bg" :src="backgroundUrl" width="450px" hidden />
-        <canvas id="res" :width="bgInfo.width" :height="bgInfo.height"></canvas>
+        <canvas id="res" :width="bgInfo.width" :height="bgInfo.height" hidden></canvas>
+        <img :src="finalResultUrl" width="450px" />
       </el-col>
     </el-row>
   </div>
@@ -270,8 +271,8 @@ export default {
     },
     finishCut() {
       this.cutFinished = false;
-      this.bgInfo.width = 450;
-      this.bgInfo.height = 600;
+      this.bgInfo.width = 900;
+      this.bgInfo.height = 1200;
       this.$refs["cropper"].getCropBlob(async data => {
         this.backgroundUrl = URL.createObjectURL(data);
         console.log(data);
@@ -279,7 +280,7 @@ export default {
         console.log(this.backgroundUrl);
       });
     },
-    toDrawImage() {
+    async toDrawImage() {
       /**
        * @author zhangxinxu(.com)
        * @licence MIT
@@ -340,19 +341,19 @@ export default {
           .drawImage(bgImage, 0, 0, this.bgInfo.width, this.bgInfo.height);
         canvas
           .getContext("2d")
-          .drawImage(document.getElementById("calendar"), 24, 482, 18, 18);
+          .drawImage(document.getElementById("calendar"), 48, 482*2, 18*2, 18*2);
         canvas
           .getContext("2d")
-          .drawImage(document.getElementById("icon"), 25, 25, 33, 33);
+          .drawImage(document.getElementById("icon"), 25*2, 25*2, 33*2, 33*2);
         canvas
           .getContext("2d")
-          .drawImage(document.getElementById("QRCode"), 365, 496, 63, 63);
+          .drawImage(document.getElementById("QRCode"), 365*2, 496*2, 63*2, 63*2);
         let ctx = canvas.getContext("2d");
         ctx.imageSmoothingEnabled = false;
-        ctx.font = "16px 微软雅黑"; //canvas字体
+        ctx.font = "32px 微软雅黑"; //canvas字体
         ctx.fillStyle = "#fef9f3";
-        ctx.letterSpacingText("我在百词斩背单词", 76, 48, 1);
-        ctx.font = "16px Arial";
+        ctx.letterSpacingText("我在百词斩背单词", 76*2, 48*2, 1);
+        ctx.font = "32px Arial";
         let targetTime = new Date(this.form.currentDate);
         console.log(targetTime.toDateString());
         const days = [
@@ -394,25 +395,21 @@ export default {
         });
         dateText = dateText + texts[2].toString();
         console.log(dateText);
-        ctx.letterSpacingText(dateText, 50, 498, 0);
-        ctx.font = "35px Bahnschrift";
-        ctx.fillText(this.form.wordnum.toString(), 24, 552, ctx.measureText(this.form.wordnum.toString()).width - 8);
-        ctx.fillText(this.form.daynum.toString(), 118, 552, ctx.measureText(this.form.daynum.toString()).width - 8);
-        ctx.font = " 100 13px 微软雅黑";
+        ctx.letterSpacingText(dateText, 50*2, 498*2, 0);
+        ctx.font = "70px Bahnschrift";
+        ctx.fillText(this.form.wordnum.toString(), 24*2, 552*2, ctx.measureText(this.form.wordnum.toString()).width - 8);
+        ctx.fillText(this.form.daynum.toString(), 118*2, 552*2, ctx.measureText(this.form.daynum.toString()).width - 8);
+        ctx.font = " 100 26px 微软雅黑";
         ctx.fillStyle = "#DCDCDC";
-        ctx.letterSpacingText("今日单词", 24, 572, 1);
-        ctx.letterSpacingText("坚持天数", 118, 572, 1);
-        ctx.font = " 100 9px 微软雅黑";
-        ctx.letterSpacingText("扫码下载", 355, 572, 1);
-        ctx.font = " 500 9px 微软雅黑";
-        ctx.letterSpacingText("百词斩", 398, 572, 1);
+        ctx.letterSpacingText("今日单词", 24*2, 572*2, 1);
+        ctx.letterSpacingText("坚持天数", 118*2, 572*2, 1);
+        ctx.font = " 100 18px 微软雅黑";
+        ctx.letterSpacingText("扫码下载", 355*2, 572*2, 1);
+        ctx.font = " 500 18px 微软雅黑";
+        ctx.letterSpacingText("百词斩", 398*2, 572*2, 1);
+        this.finalResultUrl = canvas.toDataURL("image/png");
       };
       bgImage.src = this.backgroundUrl;
-
-      console.log(bgImage);
-      this.adUrl = canvas.toDataURL("image/png");
-      this.finalResultUrl = canvas.toDataURL("image/png");
-      console.log(canvas);
     },
   }
 };
