@@ -352,7 +352,7 @@ export default {
         ctx.imageSmoothingEnabled = false;
         ctx.font = "32px 微软雅黑"; //canvas字体
         ctx.fillStyle = "#fef9f3";
-        ctx.letterSpacingText("我在百词斩背单词", 76*2, 48*2, 1);
+        ctx.letterSpacingText("我在百词斩背单词", 68*2, 48*2, 2);
         ctx.font = "32px Arial";
         let targetTime = new Date(this.form.currentDate);
         console.log(targetTime.toDateString());
@@ -397,15 +397,16 @@ export default {
         console.log(dateText);
         ctx.letterSpacingText(dateText, 50*2, 498*2, 0);
         ctx.font = "70px Bahnschrift";
-        ctx.fillText(this.form.wordnum.toString(), 24*2, 544*2, ctx.measureText(this.form.wordnum.toString()).width - 8);
-        ctx.fillText(this.form.daynum.toString(), 118*2, 544*2, ctx.measureText(this.form.daynum.toString()).width - 8);
+        ctx.fillText(this.form.wordnum.toString(), 24*2, 538*2, ctx.measureText(this.form.wordnum.toString()).width - 8);
+        ctx.fillText(this.form.daynum.toString(), 118*2, 538*2, ctx.measureText(this.form.daynum.toString()).width - 8);
         ctx.font = " 100 24px 微软雅黑";
         ctx.fillStyle = "#DCDCDC";
-        ctx.letterSpacingText("今日单词", 24*2, 572*2, 1);
-        ctx.letterSpacingText("坚持天数", 118*2, 572*2, 1);
+        ctx.letterSpacingText("今日单词", 24*2, 566*2, 1);
+        ctx.letterSpacingText("坚持天数", 118*2, 566*2, 1);
         ctx.font = " 100 18px 微软雅黑";
         ctx.letterSpacingText("扫码下载", 355*2, 572*2, 1);
         ctx.font = " 500 18px 微软雅黑";
+        ctx.fillStyle = "#FFFFFF";
         ctx.letterSpacingText("百词斩", 398*2, 572*2, 1);
         this.finalResultUrl = canvas.toDataURL("image/png");
       };
