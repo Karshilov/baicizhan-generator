@@ -9,3 +9,14 @@
 
 1.寻找破解下一关的密文的方法的关键就在本页面内
 2.多点击一下总没有坏处的
+
+如果你找到了一些东西，但是不知道怎么用，你可能需要这些东西：
+1.
+```py
+......(something you find)
+
+code = "密码的密文"
+print (decode(code))
+```
+2.https://www.luogu.com.cn/ide
+（需要注册使用，选择python）
