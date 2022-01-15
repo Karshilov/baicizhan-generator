@@ -21,7 +21,7 @@
     "less-loader": "^5.0.0",
     "markdown-it": "^10.0.0",
     "markdown-loader": "5.1.0",
-    "marked": "^1.0.0",
+    "marked": "^4.0.10",
     "minio": "^7.0.14",
     "moment": "^2.24.0",
     "node-xlsx": "^0.15.0",
